@@ -8,17 +8,27 @@ import java.util.Properties;
 import javafx.fxml.FXML;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.cas.inv.InvMaster;
+import org.guanzon.cas.inv.InvSerial;
 import org.guanzon.cas.inv.Inventory;
 import org.guanzon.cas.inv.services.InvControllers;
 import org.guanzon.cas.parameter.Branch;
 import org.guanzon.cas.parameter.Brand;
 import org.guanzon.cas.parameter.Category;
 import org.guanzon.cas.parameter.Color;
+import org.guanzon.cas.parameter.Country;
 import org.guanzon.cas.parameter.Industry;
+import org.guanzon.cas.parameter.InvLocation;
 import org.guanzon.cas.parameter.InvType;
 import org.guanzon.cas.parameter.Measure;
 import org.guanzon.cas.parameter.Model;
 import org.guanzon.cas.parameter.ModelVariant;
+import org.guanzon.cas.parameter.Province;
+import org.guanzon.cas.parameter.Region;
+import org.guanzon.cas.parameter.Section;
+import org.guanzon.cas.parameter.Term;
+import org.guanzon.cas.parameter.TownCity;
+import org.guanzon.cas.parameter.Warehouse;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
 
@@ -57,13 +67,124 @@ public class PrimaryController {
 //            searchInventoryType(instance);
 //            searchIndustry(instance);
 //            searchCategory(instance);
-//            searchInventory(instance);
-            searchBranch(instance);
+            searchInventory(instance);
+//            searchBranch(instance);
+//            searchWarehouse(instance);
+//            searchSection(instance);
+//            searchInventoryLocation(instance);
+//            searchTerm(instance);
+//            searchInventoryMaster(instance);
+//            searchInventorySerial(instance);
+//            searchTownCity(instance);
+//            searchCountry(instance);
+//            searchRegion(instance);
+//            searchProvince(instance);
         } catch (SQLException | GuanzonException e) {
             e.printStackTrace();
         }
         
         App.setRoot("secondary");
+    }
+    
+    private void searchProvince(GRiderCAS instance) throws SQLException, GuanzonException{
+        Province record = new ParamControllers(instance, null).Province();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getProvinceId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().getRegionId());
+            System.out.println(record.getModel().Region().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchRegion(GRiderCAS instance) throws SQLException, GuanzonException{
+        Region record = new ParamControllers(instance, null).Region();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getRegionId());
+            System.out.println(record.getModel().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchCountry(GRiderCAS instance) throws SQLException, GuanzonException{
+        Country record = new ParamControllers(instance, null).Country();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getCountryId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().getNationality());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchTownCity(GRiderCAS instance) throws SQLException, GuanzonException{
+        TownCity record = new ParamControllers(instance, null).TownCity();
+
+        JSONObject loJSON = record.searchRecord("", false, "01");        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getTownId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().getProvinceId());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchInventorySerial(GRiderCAS instance) throws SQLException, GuanzonException{
+        InvSerial record = new InvControllers(instance, null).InventorySerial();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getSerialId());
+            System.out.println(record.getModel().getSerial01());
+            System.out.println(record.getModel().getSerial02());
+            System.out.println(record.getModel().getStockId());
+            System.out.println(record.getModel().Inventory().getDescription());       
+            System.out.println(record.SerialRegistration().getFileNumber());       
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchTerm(GRiderCAS instance) throws SQLException, GuanzonException{
+        Term record = new ParamControllers(instance, null).Term();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getTermId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().getTermValue());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchInventoryLocation(GRiderCAS instance) throws SQLException, GuanzonException{
+        InvLocation record = new ParamControllers(instance, null).InventoryLocation();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getLocationId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().Warehouse().getDescription());
+            System.out.println(record.getModel().Section().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchSection(GRiderCAS instance) throws SQLException, GuanzonException{
+        Section record = new ParamControllers(instance, null).Section();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getSectionId());
+            System.out.println(record.getModel().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchWarehouse(GRiderCAS instance) throws SQLException, GuanzonException{
+        Warehouse record = new ParamControllers(instance, null).Warehouse();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getWarehouseId());
+            System.out.println(record.getModel().getDescription());
+        } else System.out.println("No record was selected.");
     }
     
     private void searchBranch(GRiderCAS instance) throws SQLException, GuanzonException{
@@ -147,13 +268,15 @@ public class PrimaryController {
     private void searchModelVariant(GRiderCAS instance) throws SQLException, GuanzonException{
         ModelVariant record = new ParamControllers(instance, null).ModelVariant();
 
-        JSONObject loJSON = record.searchRecord("", false);        
+        JSONObject loJSON = record.searchRecordByModel("tmx", false, "00001");        
         if ("success".equals((String) loJSON.get("result"))){
             System.out.println(record.getModel().getVariantId());
             System.out.println(record.getModel().getDescription());
             System.out.println(record.getModel().getYearModel());
+            System.out.println(record.getModel().Model().getModelId());
             System.out.println(record.getModel().Model().getDescription());
             System.out.println(record.getModel().Model().getModelCode());
+            System.out.println(record.getModel().Model().getBrandId());
             System.out.println(record.getModel().Color().getDescription());
         } else System.out.println("No record was selected.");
     }
@@ -171,7 +294,7 @@ public class PrimaryController {
     private void searchInventory(GRiderCAS instance) throws SQLException, GuanzonException{
         Inventory record = new InvControllers(instance, null).Inventory();
 
-        JSONObject loJSON = record.searchRecord("", false);        
+        JSONObject loJSON = record.searchRecordOfVariants("", false);        
         if ("success".equals((String) loJSON.get("result"))){
             System.out.println(record.getModel().getStockId());
             System.out.println(record.getModel().getBarCode());
@@ -181,6 +304,18 @@ public class PrimaryController {
             System.out.println(record.getModel().Color().getDescription());
             System.out.println(record.getModel().Measure().getDescription());
             System.out.println(record.getModel().Category().getDescription());
+            System.out.println(record.Variant().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchInventoryMaster(GRiderCAS instance) throws SQLException, GuanzonException{
+        InvMaster record = new InvControllers(instance, null).InventoryMaster();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getStockId());
+            System.out.println(record.getModel().getBranchCode());
+            System.out.println(record.getModel().getQuantityOnHand());
         } else System.out.println("No record was selected.");
     }
     
