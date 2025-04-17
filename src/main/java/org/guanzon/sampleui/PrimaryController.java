@@ -4,10 +4,21 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 import javafx.fxml.FXML;
+import org.guanzon.appdriver.agent.systables.SysTableContollers;
+import org.guanzon.appdriver.agent.systables.TransactionAttachment;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.cas.client.ClientInfo;
+import org.guanzon.cas.client.ClientGUI;
+import org.guanzon.cas.client.services.ClientControllers;
+import org.guanzon.cas.gl.AccountChart;
+import org.guanzon.cas.gl.TransactionAccountChart;
+import org.guanzon.cas.gl.services.GLControllers;
 import org.guanzon.cas.inv.InvMaster;
 import org.guanzon.cas.inv.InvSerial;
 import org.guanzon.cas.inv.Inventory;
@@ -16,7 +27,9 @@ import org.guanzon.cas.parameter.Branch;
 import org.guanzon.cas.parameter.Brand;
 import org.guanzon.cas.parameter.Category;
 import org.guanzon.cas.parameter.Color;
+import org.guanzon.cas.parameter.Company;
 import org.guanzon.cas.parameter.Country;
+import org.guanzon.cas.parameter.Department;
 import org.guanzon.cas.parameter.Industry;
 import org.guanzon.cas.parameter.InvLocation;
 import org.guanzon.cas.parameter.InvType;
@@ -42,8 +55,8 @@ public class PrimaryController {
             } else {
                 path = "/srv/GGC_Maven_Systems";
             }
+
             System.setProperty("sys.default.path.config", path);
-            System.setProperty("sys.default.path.metadata", System.getProperty("sys.default.path.config") + "/config/metadata/new/");
 
             if (!loadProperties()) {
                 System.err.println("Unable to load config.");
@@ -55,10 +68,13 @@ public class PrimaryController {
             GRiderCAS instance = new GRiderCAS("gRider");
 
             if (!instance.logUser("gRider", "M001000001")) {
-                System.err.println(instance.getMessage());
+//                System.err.println(instance.getMessage());
                 System.exit(1);
             }
             
+            LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            
+            testNewClient(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -67,7 +83,7 @@ public class PrimaryController {
 //            searchInventoryType(instance);
 //            searchIndustry(instance);
 //            searchCategory(instance);
-            searchInventory(instance);
+//            searchInventory(instance);
 //            searchBranch(instance);
 //            searchWarehouse(instance);
 //            searchSection(instance);
@@ -79,11 +95,113 @@ public class PrimaryController {
 //            searchCountry(instance);
 //            searchRegion(instance);
 //            searchProvince(instance);
+//            searchCompany(instance);
+//            searchDepartment(instance);
+//            searchAccountChart(instance);
+//            searchGeneralLedger(instance);
+//            searchClient(instance);
+//            searchTransactionAttachment(instance);
         } catch (SQLException | GuanzonException e) {
             e.printStackTrace();
         }
         
         App.setRoot("secondary");
+    }
+    
+    private void testNewClient(GRiderCAS instance, LogWrapper wrapper){
+        try {
+            ClientGUI client = new ClientGUI();
+            client.setGRider(instance);
+            client.setLogWrapper(wrapper);
+            client.setClientId("");
+
+            CommonUtils.showModal(client);
+            
+            if (!client.isCancelled()){
+                System.out.println("Client Id: " + client.getClient().getModel().getClientId());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    
+    private void searchTransactionAttachment(GRiderCAS instance) throws SQLException, GuanzonException{
+        TransactionAttachment record = new SysTableContollers(instance, null).TransactionAttachment();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getTransactionNo());
+            System.out.println(record.getModel().getSourceNo());
+            System.out.println(record.getModel().getSourceCode());
+            System.out.println(record.getModel().getFileName());
+        } else System.out.println("No record was selected.");
+        
+        
+        //load list of attachment per transaction
+        List loList = record.getAttachments("PRec", "M00125000001");
+        for (int lnCtr = 0; lnCtr <= loList.size() - 1; lnCtr++){
+            System.out.println("File " + (lnCtr + 1) + " transaction no: " + loList.get(lnCtr));
+            loJSON = record.openRecord((String) loList.get(lnCtr));
+            
+            if ("success".equals((String) loJSON.get("result"))){
+                System.out.println(record.getModel().getTransactionNo());
+                System.out.println(record.getModel().getSourceNo());
+                System.out.println(record.getModel().getSourceCode());
+                System.out.println(record.getModel().getFileName());
+            }
+        }
+    }
+    
+    private void searchClient(GRiderCAS instance) throws SQLException, GuanzonException{
+        ClientInfo record = new ClientControllers(instance, null).ClientInfo();
+
+        JSONObject loJSON = record.searchRecord("Cuison", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getClientId());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchGeneralLedger(GRiderCAS instance) throws SQLException, GuanzonException{
+        TransactionAccountChart record = new GLControllers(instance, null).TransactionAccountChart();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getGLCode());
+            System.out.println(record.getModel().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchAccountChart(GRiderCAS instance) throws SQLException, GuanzonException{
+        AccountChart record = new GLControllers(instance, null).AccountChart();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getAccountCode());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().General_Ledger().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchDepartment(GRiderCAS instance) throws SQLException, GuanzonException{
+        Department record = new ParamControllers(instance, null).Department();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getDepartmentId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().getDepartmentCode());
+        } else System.out.println("No record was selected.");
+    }
+    
+    private void searchCompany(GRiderCAS instance) throws SQLException, GuanzonException{
+        Company record = new ParamControllers(instance, null).Company();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getCompanyId());
+            System.out.println(record.getModel().getCompanyName());
+            System.out.println(record.getModel().getCompanyCode());
+        } else System.out.println("No record was selected.");
     }
     
     private void searchProvince(GRiderCAS instance) throws SQLException, GuanzonException{
@@ -304,7 +422,7 @@ public class PrimaryController {
             System.out.println(record.getModel().Color().getDescription());
             System.out.println(record.getModel().Measure().getDescription());
             System.out.println(record.getModel().Category().getDescription());
-            System.out.println(record.Variant().getDescription());
+            System.out.println(record.getModel().Variant().getDescription());
         } else System.out.println("No record was selected.");
     }
     
@@ -319,14 +437,19 @@ public class PrimaryController {
         } else System.out.println("No record was selected.");
     }
     
-    private boolean loadProperties() {
+    private static boolean loadProperties() {
         try {
             Properties po_props = new Properties();
             po_props.load(new FileInputStream(System.getProperty("sys.default.path.config") + "/config/cas.properties"));
 
-            System.setProperty("store.branch.code", po_props.getProperty("store.branch.code"));
-            System.setProperty("store.inventory.industry", po_props.getProperty("store.inventory.category"));
-
+            System.setProperty("sys.default.path.temp", System.getProperty("sys.default.path.config") + po_props.getProperty("sys.default.path.temp"));
+            System.setProperty("sys.default.path.metadata", System.getProperty("sys.default.path.config") + po_props.getProperty("sys.default.path.metadata"));
+            
+            System.setProperty("app.global.company", po_props.getProperty("app.global.company"));
+            System.setProperty("app.global.industry", po_props.getProperty("app.global.industry"));
+            System.setProperty("app.global.category", po_props.getProperty("app.global.category"));
+            
+            System.setProperty("app.global.branch", po_props.getProperty("app.global.branch"));
             return true;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();

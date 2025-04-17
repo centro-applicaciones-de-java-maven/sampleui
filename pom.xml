@@ -101,5 +101,15 @@
             <artifactId>cas-inv</artifactId>
             <version>0.2-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-gl</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-client</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
