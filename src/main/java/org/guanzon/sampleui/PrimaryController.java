@@ -74,7 +74,7 @@ public class PrimaryController {
             
             LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             
-            testNewClient(instance, wrapper);
+//            testNewClient(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -96,7 +96,7 @@ public class PrimaryController {
 //            searchRegion(instance);
 //            searchProvince(instance);
 //            searchCompany(instance);
-//            searchDepartment(instance);
+            searchDepartment(instance);
 //            searchAccountChart(instance);
 //            searchGeneralLedger(instance);
 //            searchClient(instance);
