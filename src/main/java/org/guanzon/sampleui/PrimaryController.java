@@ -39,6 +39,7 @@ import org.guanzon.cas.parameter.ModelVariant;
 import org.guanzon.cas.parameter.Province;
 import org.guanzon.cas.parameter.Region;
 import org.guanzon.cas.parameter.Section;
+import org.guanzon.cas.parameter.TaxCode;
 import org.guanzon.cas.parameter.Term;
 import org.guanzon.cas.parameter.TownCity;
 import org.guanzon.cas.parameter.Warehouse;
@@ -74,7 +75,7 @@ public class PrimaryController {
             
             LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             
-            testNewClient(instance, wrapper);
+//            testNewClient(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -84,7 +85,7 @@ public class PrimaryController {
 //            searchIndustry(instance);
 //            searchCategory(instance);
 //            searchInventory(instance);
-//            searchBranch(instance);
+            searchBranch(instance);
 //            searchWarehouse(instance);
 //            searchSection(instance);
 //            searchInventoryLocation(instance);
@@ -101,11 +102,23 @@ public class PrimaryController {
 //            searchGeneralLedger(instance);
 //            searchClient(instance);
 //            searchTransactionAttachment(instance);
+//            searchTaxCode(instance);
         } catch (SQLException | GuanzonException e) {
             e.printStackTrace();
         }
         
         App.setRoot("secondary");
+    }
+    
+    private void searchTaxCode(GRiderCAS instance) throws SQLException, GuanzonException{
+        TaxCode record = new ParamControllers(instance, null).TaxCode();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getTaxCode());
+            System.out.println(record.getModel().getRegularRate());
+            System.out.println(record.getModel().getGovernmentRate());
+        } else System.out.println("No record was selected.");
     }
     
     private void testNewClient(GRiderCAS instance, LogWrapper wrapper){
@@ -306,13 +319,18 @@ public class PrimaryController {
     }
     
     private void searchBranch(GRiderCAS instance) throws SQLException, GuanzonException{
+        //get industry using branch parameter search
         Branch record = new ParamControllers(instance, null).Branch();
-
         JSONObject loJSON = record.searchRecord("", false);        
         if ("success".equals((String) loJSON.get("result"))){
             System.out.println(record.getModel().getBranchCode());
             System.out.println(record.getModel().getBranchName());
+            System.out.println(record.getModel().getCompanyId());
+            System.out.println(record.getModel().getIndustryCode());
         } else System.out.println("No record was selected.");
+        
+        //get industry through gRider
+        System.out.println(instance.getIndustry());
     }
     
     private void searchIndustry(GRiderCAS instance) throws SQLException, GuanzonException{
