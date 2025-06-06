@@ -97,7 +97,7 @@ public class PrimaryController {
 //            searchRegion(instance);
 //            searchProvince(instance);
 //            searchCompany(instance);
-//            searchDepartment(instance);
+            searchDepartment(instance);
 //            searchAccountChart(instance);
 //            searchGeneralLedger(instance);
 //            searchClient(instance);
