@@ -45,6 +45,8 @@ import org.guanzon.cas.parameter.TownCity;
 import org.guanzon.cas.parameter.Warehouse;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.cas.cashflow.BankAccountMaster;
+import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 
 public class PrimaryController {
     @FXML
@@ -80,12 +82,12 @@ public class PrimaryController {
 //            searchModelVariant(instance);
 //            searchColor(instance);
 //            searchModel(instance);
-//            searchBrand(instance);
+            searchBrand(instance);
 //            searchInventoryType(instance);
 //            searchIndustry(instance);
 //            searchCategory(instance);
 //            searchInventory(instance);
-            searchBranch(instance);
+//            searchBranch(instance);
 //            searchWarehouse(instance);
 //            searchSection(instance);
 //            searchInventoryLocation(instance);
@@ -97,17 +99,29 @@ public class PrimaryController {
 //            searchRegion(instance);
 //            searchProvince(instance);
 //            searchCompany(instance);
-            searchDepartment(instance);
+//            searchDepartment(instance);
 //            searchAccountChart(instance);
 //            searchGeneralLedger(instance);
 //            searchClient(instance);
 //            searchTransactionAttachment(instance);
 //            searchTaxCode(instance);
+//            searchBankAccount(instance);
         } catch (SQLException | GuanzonException e) {
             e.printStackTrace();
         }
         
         App.setRoot("secondary");
+    }
+    
+    private void searchBankAccount(GRiderCAS instance) throws SQLException, GuanzonException{
+        BankAccountMaster record = new CashflowControllers(instance, null).BankAccountMaster();
+
+        JSONObject loJSON = record.searchRecord("", false);        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getBankAccountId());
+            System.out.println(record.getModel().getAccountNo());
+            System.out.println(record.getModel().getAccountName());
+        } else System.out.println("No record was selected.");
     }
     
     private void searchTaxCode(GRiderCAS instance) throws SQLException, GuanzonException{
