@@ -41,7 +41,8 @@ public class PrimaryController {
             
             LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
 //            searchStockID(instance);
-            testNewClient(instance, wrapper);
+//            testNewClient(instance, wrapper);
+            testLoadClient(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -105,6 +106,23 @@ public class PrimaryController {
             client.setGRider(instance);
             client.setLogWrapper(wrapper);
             client.setClientId("");
+
+            CommonUtils.showModal(client);
+            
+            if (!client.isCancelled()){
+                System.out.println("Client Id: " + client.getClient().getModel().getClientId());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    
+    private void testLoadClient(GRiderCAS instance, LogWrapper wrapper){
+        try {
+            ClientGUI client = new ClientGUI();
+            client.setGRider(instance);
+            client.setLogWrapper(wrapper);
+            client.setClientId("A00125000001");
 
             CommonUtils.showModal(client);
             
