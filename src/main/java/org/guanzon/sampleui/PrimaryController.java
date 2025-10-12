@@ -10,6 +10,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.constant.ClientType;
 import org.guanzon.cas.client.ClientGUI;
 
 public class PrimaryController {
@@ -122,7 +123,8 @@ public class PrimaryController {
             ClientGUI client = new ClientGUI();
             client.setGRider(instance);
             client.setLogWrapper(wrapper);
-            client.setClientId("A00125000001");
+            client.setClientType(ClientType.INDIVIDUAL);
+            client.setClientId("");
 
             CommonUtils.showModal(client);
             
