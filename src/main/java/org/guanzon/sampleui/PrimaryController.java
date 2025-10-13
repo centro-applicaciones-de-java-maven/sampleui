@@ -12,6 +12,10 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.ClientType;
 import org.guanzon.cas.client.ClientGUI;
+import org.guanzon.cas.client.account.AP_Client_Master;
+import org.guanzon.cas.client.account.Account_Accreditation;
+import org.guanzon.cas.client.services.ClientControllers;
+import org.json.simple.JSONObject;
 
 public class PrimaryController {
     @FXML
@@ -41,9 +45,11 @@ public class PrimaryController {
             }
             
             LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+//            searchAccountAccreditation(instance, wrapper);
+            searchAPClient(instance, wrapper);
 //            searchStockID(instance);
 //            testNewClient(instance, wrapper);
-            testLoadClient(instance, wrapper);
+//            testLoadClient(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -100,6 +106,39 @@ public class PrimaryController {
 //            System.out.println(record.getModel().getGovernmentRate());
 //        } else System.out.println("No record was selected.");
 //    }
+    
+    private void searchAccountAccreditation(GRiderCAS instance, LogWrapper wrapper){
+        try {
+            Account_Accreditation record = new ClientControllers(instance, wrapper).AccountAccreditation();
+
+            JSONObject loJSON = record.searchRecord("", false);    
+            if ("success".equals((String) loJSON.get("result"))){
+                System.out.println(record.getModel().getClientId());
+                System.out.println(record.getModel().getAddressId());
+                System.out.println(record.getModel().getContactId());
+            } else System.out.println("No record was selected.");
+          
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    
+    private void searchAPClient(GRiderCAS instance, LogWrapper wrapper){
+        try {
+            AP_Client_Master record = new ClientControllers(instance, wrapper).APClientMaster();
+            record.setRecordStatus("10");
+
+            JSONObject loJSON = record.searchRecord("", false);    
+            if ("success".equals((String) loJSON.get("result"))){
+                System.out.println(record.getModel().getClientId());
+                System.out.println(record.getModel().getAddressId());
+                System.out.println(record.getModel().getContactId());
+            } else System.out.println("No record was selected.");
+          
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
     
     private void testNewClient(GRiderCAS instance, LogWrapper wrapper){
         try {
