@@ -18,6 +18,7 @@ import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
 
 public class PrimaryController {
+
     @FXML
     private void switchToSecondary() throws IOException {
         try {
@@ -43,13 +44,15 @@ public class PrimaryController {
 //                System.err.println(instance.getMessage());
                 System.exit(1);
             }
-            
+
             LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
 //            searchAccountAccreditation(instance, wrapper);
-            searchAPClient(instance, wrapper);
+//            searchAPClient(instance, wrapper);
 //            searchStockID(instance);
 //            testNewClient(instance, wrapper);
 //            testLoadClient(instance, wrapper);
+            testNewInstitution(instance, wrapper);
+            testLoadInstitution(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -81,10 +84,10 @@ public class PrimaryController {
         } catch (SQLException | GuanzonException e) {
             e.printStackTrace();
         }
-        
+
         App.setRoot("secondary");
     }
-    
+
 //    private void searchBankAccount(GRiderCAS instance) throws SQLException, GuanzonException{
 //        BankAccountMaster record = new CashflowControllers(instance, null).BankAccountMaster();
 //
@@ -106,41 +109,44 @@ public class PrimaryController {
 //            System.out.println(record.getModel().getGovernmentRate());
 //        } else System.out.println("No record was selected.");
 //    }
-    
-    private void searchAccountAccreditation(GRiderCAS instance, LogWrapper wrapper){
+    private void searchAccountAccreditation(GRiderCAS instance, LogWrapper wrapper) {
         try {
             Account_Accreditation record = new ClientControllers(instance, wrapper).AccountAccreditation();
 
-            JSONObject loJSON = record.searchRecord("", false);    
-            if ("success".equals((String) loJSON.get("result"))){
+            JSONObject loJSON = record.searchRecord("", false);
+            if ("success".equals((String) loJSON.get("result"))) {
                 System.out.println(record.getModel().getClientId());
                 System.out.println(record.getModel().getAddressId());
                 System.out.println(record.getModel().getContactId());
-            } else System.out.println("No record was selected.");
-          
+            } else {
+                System.out.println("No record was selected.");
+            }
+
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
-    
-    private void searchAPClient(GRiderCAS instance, LogWrapper wrapper){
+
+    private void searchAPClient(GRiderCAS instance, LogWrapper wrapper) {
         try {
             AP_Client_Master record = new ClientControllers(instance, wrapper).APClientMaster();
             record.setRecordStatus("10");
 
-            JSONObject loJSON = record.searchRecord("", false);    
-            if ("success".equals((String) loJSON.get("result"))){
+            JSONObject loJSON = record.searchRecord("", false);
+            if ("success".equals((String) loJSON.get("result"))) {
                 System.out.println(record.getModel().getClientId());
                 System.out.println(record.getModel().getAddressId());
                 System.out.println(record.getModel().getContactId());
-            } else System.out.println("No record was selected.");
-          
+            } else {
+                System.out.println("No record was selected.");
+            }
+
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
-    
-    private void testNewClient(GRiderCAS instance, LogWrapper wrapper){
+
+    private void testNewClient(GRiderCAS instance, LogWrapper wrapper) {
         try {
             ClientGUI client = new ClientGUI();
             client.setGRider(instance);
@@ -148,16 +154,16 @@ public class PrimaryController {
             client.setClientId("");
 
             CommonUtils.showModal(client);
-            
-            if (!client.isCancelled()){
+
+            if (!client.isCancelled()) {
                 System.out.println("Client Id: " + client.getClient().getModel().getClientId());
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
-    
-    private void testLoadClient(GRiderCAS instance, LogWrapper wrapper){
+
+    private void testLoadClient(GRiderCAS instance, LogWrapper wrapper) {
         try {
             ClientGUI client = new ClientGUI();
             client.setGRider(instance);
@@ -166,15 +172,51 @@ public class PrimaryController {
             client.setClientId("");
 
             CommonUtils.showModal(client);
-            
-            if (!client.isCancelled()){
+
+            if (!client.isCancelled()) {
                 System.out.println("Client Id: " + client.getClient().getModel().getClientId());
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
-    
+
+    private void testNewInstitution(GRiderCAS instance, LogWrapper wrapper) {
+        try {
+            ClientGUI client = new ClientGUI();
+            client.setGRider(instance);
+            client.setLogWrapper(wrapper);
+            client.setClientType(ClientType.INSTITUTION);
+            client.setClientId("");
+
+            CommonUtils.showModal(client);
+
+            if (!client.isCancelled()) {
+                System.out.println("Client Id: " + client.getClient().getModel().getClientId());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void testLoadInstitution(GRiderCAS instance, LogWrapper wrapper) {
+        try {
+            ClientGUI client = new ClientGUI();
+            client.setGRider(instance);
+            client.setLogWrapper(wrapper);
+            client.setClientType(ClientType.INSTITUTION);
+            client.setClientId("");
+
+            CommonUtils.showModal(client);
+
+            if (!client.isCancelled()) {
+                System.out.println("Client Id: " + client.getClient().getModel().getClientId());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
 //    private void searchTransactionAttachment(GRiderCAS instance) throws SQLException, GuanzonException{
 //        TransactionAttachment record = new SysTableContollers(instance, null).TransactionAttachment();
 //
@@ -508,7 +550,6 @@ public class PrimaryController {
 //            System.out.println(record.getModel().getQuantityOnHand());
 //        } else System.out.println("No record was selected.");
 //    }
-    
     private static boolean loadProperties() {
         try {
             Properties po_props = new Properties();
@@ -516,11 +557,11 @@ public class PrimaryController {
 
             System.setProperty("sys.default.path.temp", System.getProperty("sys.default.path.config") + po_props.getProperty("sys.default.path.temp"));
             System.setProperty("sys.default.path.metadata", System.getProperty("sys.default.path.config") + po_props.getProperty("sys.default.path.metadata"));
-            
+
             System.setProperty("app.global.company", po_props.getProperty("app.global.company"));
             System.setProperty("app.global.industry", po_props.getProperty("app.global.industry"));
             System.setProperty("app.global.category", po_props.getProperty("app.global.category"));
-            
+
             System.setProperty("app.global.branch", po_props.getProperty("app.global.branch"));
             return true;
         } catch (FileNotFoundException ex) {
