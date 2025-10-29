@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.guanzon</groupId>
     <artifactId>sampleui</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -92,9 +92,9 @@
     </profiles>
     <dependencies>
         <dependency>
-            <groupId>org.guanzon</groupId>
+            <groupId>ph.com.guanzongroup</groupId>
             <artifactId>cas-client</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
