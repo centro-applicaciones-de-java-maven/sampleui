@@ -15,44 +15,62 @@ import org.guanzon.cas.client.ClientGUI;
 import org.guanzon.cas.client.account.AP_Client_Master;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
+import org.guanzon.cas.parameter.Brand;
+import org.guanzon.cas.parameter.services.ParamControllers;
+import org.guanzon.cas.purchasing.controller.PurchaseOrder;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
+import org.guanzon.cas.purchasing.services.PurchaseOrderControllers;
+import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.cas.cashflow.APPaymentAdjustment;
+import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 
 public class PrimaryController {
 
     @FXML
-    private void switchToSecondary() throws IOException {
+    private void switchToSecondary() throws IOException, CloneNotSupportedException, Exception {
         try {
             String path;
+            String lsTemp;
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                 path = "D:/GGC_Maven_Systems";
+                lsTemp = "D:/temp";
             } else {
                 path = "/srv/GGC_Maven_Systems";
+                lsTemp = "/srv/temp";
             }
-
             System.setProperty("sys.default.path.config", path);
-
+            System.setProperty("sys.default.path.metadata", System.getProperty("sys.default.path.config") + "/config/metadata/new/");
+            System.setProperty("sys.default.path.temp", lsTemp);
+            
             if (!loadProperties()) {
                 System.err.println("Unable to load config.");
                 System.exit(1);
             } else {
                 System.out.println("Config file loaded successfully.");
             }
-
+            
             GRiderCAS instance = new GRiderCAS("gRider");
 
             if (!instance.logUser("gRider", "M001000001")) {
-//                System.err.println(instance.getMessage());
+                System.err.println(instance.getMessage());
                 System.exit(1);
             }
 
             LogWrapper wrapper = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            
+//            APPaymentAdjustmentStatusHist(instance, wrapper);
+            POTransApprovalHist(instance, wrapper);
+            POTransStatusHist(instance, wrapper);
+//            PORecTransStatusHist(instance, wrapper);
 //            searchAccountAccreditation(instance, wrapper);
 //            searchAPClient(instance, wrapper);
 //            searchStockID(instance);
 //            testNewClient(instance, wrapper);
 //            testLoadClient(instance, wrapper);
-            testNewInstitution(instance, wrapper);
-            testLoadInstitution(instance, wrapper);
+//            testNewInstitution(instance, wrapper);
+//            testLoadInstitution(instance, wrapper);
+//            testGetSupplier(instance, wrapper);
 //            searchMearusurement(instance);
 //            searchModelVariant(instance);
 //            searchColor(instance);
@@ -86,6 +104,36 @@ public class PrimaryController {
         }
 
         App.setRoot("secondary");
+    }
+    
+    private void POTransApprovalHist(GRiderCAS instance, LogWrapper wrapper) throws SQLException, GuanzonException, CloneNotSupportedException, Exception{
+        PurchaseOrder POTrans = new PurchaseOrderControllers(instance, wrapper).PurchaseOrder();
+        POTrans.InitTransaction();
+        POTrans.OpenTransaction("GK0126000251");
+        POTrans.ShowApprovalHistory();
+    }
+    
+    private void POTransStatusHist(GRiderCAS instance, LogWrapper wrapper) throws SQLException, GuanzonException, CloneNotSupportedException, Exception{
+        PurchaseOrder POTrans = new PurchaseOrderControllers(instance, wrapper).PurchaseOrder();
+        POTrans.InitTransaction();
+        POTrans.OpenTransaction("GK0126000251");
+        POTrans.ShowStatusHistory();
+    }
+    
+    private void PORecTransStatusHist(GRiderCAS instance, LogWrapper wrapper) throws SQLException, GuanzonException, CloneNotSupportedException, Exception{
+        PurchaseOrderReceiving POTrans = new PurchaseOrderReceivingControllers(instance, wrapper).PurchaseOrderReceiving();
+        POTrans.InitTransaction();
+        POTrans.OpenTransaction("GK0125000015");
+        POTrans.ShowStatusHistory();
+    }
+    
+     private void APPaymentAdjustmentStatusHist(GRiderCAS instance, LogWrapper wrapper) throws SQLException, GuanzonException, CloneNotSupportedException, Exception{
+        APPaymentAdjustment POTrans = new CashflowControllers(instance, wrapper).APPaymentAdjustment();
+        JSONObject loJSON = POTrans.OpenTransaction("GCO126000022");
+        
+        if ("success".equals((String) loJSON.get("result"))){
+            POTrans.ShowStatusHistory();
+        }
     }
 
 //    private void searchBankAccount(GRiderCAS instance) throws SQLException, GuanzonException{
@@ -211,6 +259,25 @@ public class PrimaryController {
 
             if (!client.isCancelled()) {
                 System.out.println("Client Id: " + client.getClient().getModel().getClientId());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    
+    private void testGetSupplier(GRiderCAS instance, LogWrapper wrapper) {
+        try {
+            AP_Client_Master client = new ClientControllers(instance, wrapper).APClientMaster();
+            client.setRecordStatus("1");
+            
+            JSONObject loJSON = client.searchRecord("", false);
+            
+            if ("success".equals((String) loJSON.get("result"))){
+                System.out.println("Client ID: " +client.getModel().getClientId());
+                System.out.println("Client Address ID: " + client.getModel().ClientAddress().getAddressId());
+                System.out.println("Client Contact P ID: " + client.getModel().ClientInstitutionContact().getContactPId());
+            } else {
+                System.err.println((String) loJSON.get("message"));
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -445,17 +512,17 @@ public class PrimaryController {
 //        } else System.out.println("No record was selected.");
 //    }
 //    
-//    private void searchBrand(GRiderCAS instance) throws SQLException, GuanzonException{
-//        Brand record = new ParamControllers(instance, null).Brand();
-//
-//        JSONObject loJSON = record.searchRecord("", false, "02");        
-//        if ("success".equals((String) loJSON.get("result"))){
-//            System.out.println(record.getModel().getBrandId());
-//            System.out.println(record.getModel().getDescription());
-//            System.out.println(record.getModel().Industry().getDescription());
-//        } else System.out.println("No record was selected.");
-//    }
-//    
+    private void searchBrand(GRiderCAS instance) throws SQLException, GuanzonException{
+        Brand record = new ParamControllers(instance, null).Brand();
+
+        JSONObject loJSON = record.searchRecord("", false, "09");        
+        if ("success".equals((String) loJSON.get("result"))){
+            System.out.println(record.getModel().getBrandId());
+            System.out.println(record.getModel().getDescription());
+            System.out.println(record.getModel().Industry().getDescription());
+        } else System.out.println("No record was selected.");
+    }
+    
 //    private void searchModel(GRiderCAS instance) throws SQLException, GuanzonException{
 //        Model record = new ParamControllers(instance, null).Model();
 //
@@ -554,15 +621,25 @@ public class PrimaryController {
         try {
             Properties po_props = new Properties();
             po_props.load(new FileInputStream(System.getProperty("sys.default.path.config") + "/config/cas.properties"));
-
-            System.setProperty("sys.default.path.temp", System.getProperty("sys.default.path.config") + po_props.getProperty("sys.default.path.temp"));
-            System.setProperty("sys.default.path.metadata", System.getProperty("sys.default.path.config") + po_props.getProperty("sys.default.path.metadata"));
-
-            System.setProperty("app.global.company", po_props.getProperty("app.global.company"));
-            System.setProperty("app.global.industry", po_props.getProperty("app.global.industry"));
-            System.setProperty("app.global.category", po_props.getProperty("app.global.category"));
-
-            System.setProperty("app.global.branch", po_props.getProperty("app.global.branch"));
+            
+            //industry ids
+            System.setProperty("sys.main.industry", po_props.getProperty("sys.main.industry"));
+            System.setProperty("sys.general.industry", po_props.getProperty("sys.general.industry"));
+            
+            //department ids
+            System.setProperty("sys.dept.finance", po_props.getProperty("sys.dept.finance"));
+            System.setProperty("sys.dept.procurement", po_props.getProperty("sys.dept.procurement"));
+            
+            //property for selected industry/company/category
+            System.setProperty("user.selected.industry", po_props.getProperty("user.selected.industry"));
+            System.setProperty("user.selected.category", po_props.getProperty("user.selected.category"));
+            System.setProperty("user.selected.company", po_props.getProperty("user.selected.company"));
+            
+            //properties for client token and attachments
+            System.setProperty("sys.default.client.token", System.getProperty("sys.default.path.config") + "/client.token");
+            System.setProperty("sys.default.access.token", System.getProperty("sys.default.path.config") + "/access.token");
+            System.setProperty("sys.default.path.temp.attachments", po_props.getProperty("sys.default.path.temp.attachments"));
+            
             return true;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
